@@ -62,6 +62,8 @@ typedef enum channel {
  * This function does not free any previously allocated memory;
  * looper_free() must be called before calling this function again.
  * 
+ * @sa `looper_free()`
+ * 
  * @param length_beats Length of the loop in beats.
  * @param tempo_bpm_value Tempo in beats per minute.
  */
@@ -74,6 +76,8 @@ void looper_init(uint32_t length_beats, uint32_t tempo_bpm_value);
  * It frees all memory allocated by looper_init(), and should be called before calling looper_init() again.
  * 
  * Once this function is called, no other functions in this module should be used until looper_init() is called again.
+ * 
+ * @sa `looper_init()`
  */
 void looper_free(void);
 

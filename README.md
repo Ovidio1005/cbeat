@@ -11,3 +11,8 @@ The program outputs raw (mono) audio data to `stdout`, as 8-bit unsigned integer
 
 ## Documentation
 The code is documented with [doxygen](https://www.doxygen.nl/) comments in the header files.
+
+## Plans
+- Alternate looper that uses less memory while hopefully not using that much more CPU
+- Reading note sequences/songs from files
+- Performance improvements wherever possible

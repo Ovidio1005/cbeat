@@ -1,18 +1,29 @@
 #include "custom.h"
 #include "macros.h"
 #include "utils.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 static uint32_t current_sample = 0;
 
-static uint8_t audio_data[SAMPLE_RATE] = {}; // One second buffer at SAMPLE_RATE
+static uint8_t* audio_data = NULL;
+static uint32_t audio_data_length = 0;
 
 static uint32_t samples_per_step = 1;
 static uint8_t amplitude = 255;
 
 void custom_set_data(const uint8_t* data, uint32_t length) {
-    for (int i = 0; i < SAMPLE_RATE; i++) {
-        if(i < length) audio_data[i] = data[i];
-        else audio_data[i] = 128; // Silence for remaining samples
+    audio_data_length = length;
+    audio_data = (uint8_t*)malloc(SAMPLE_RATE * sizeof(uint8_t));
+
+    // Terminate the program if memory allocation fails
+    if(!audio_data) {
+        fprintf(stderr, "Error: Memory allocation failed in custom_set_data()\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < length; i++) {
+        audio_data[i] = data[i];
     }
 }
 

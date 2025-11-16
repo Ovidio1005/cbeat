@@ -9,6 +9,9 @@
 #define BEATS 16
 #define SIXTEENTHS (BEATS * 4)
 
+#define USE_LOOPER_1
+
+#ifdef USE_LOOPER_1
 /**
  * @brief Sets up the looper to play a loop based on salinewin.exe (or specifically the interpretation at
  * https://dollchan.net/bytebeat/#4AAAA+kUtjNEKgDAIAL8m0SKYutkm4X7Kxz6+QT3ewV3uiAm1DJu5WWtqdxs6ZF6ecDkbHciQEVyJIlDhXLASKbVPcS5Ez2fYtNf5z7i4utAL).
@@ -107,11 +110,11 @@ void setup_looper(void){
     looper_set_active_channels(true, true, true, true, false);
     looper_set_channel_amplitude(NOISE, 128);
 }
-
+#elif defined(USE_LOOPER_2)
 /**
  * @brief Sets up the looper to test changes in frequency and volume within notes.
  */
-void setup_looper_2(void){
+void setup_looper(void){
     looper_init(4, 60);
     NoteAttributes n1 = {
         .play = true,
@@ -161,11 +164,11 @@ void setup_looper_2(void){
 
     looper_set_active_channels(true, true, true, true, false);
 }
-
+#elif defined(USE_LOOPER_3)
 /**
  * @brief Sets up the looper to test the custom waveform with a sine wave.
  */
-void setup_looper_3(void){
+void setup_looper(void){
     uint8_t sine_samples[8000] = {
         128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 133, 133, 133, 133, 133, 133, 133, 133, 133, 133, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135,
         136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 137, 137, 137, 137, 137, 137, 137, 137, 137, 137, 138, 138, 138, 138, 138, 138, 138, 138, 138, 138, 139, 139, 139, 139, 139, 139, 139, 139, 139, 139, 140, 140, 140, 140, 140, 140, 140, 140, 140, 140, 141, 141, 141, 141, 141, 141, 141, 141, 141, 141, 142, 142, 142, 142, 142, 142, 142, 142, 142, 142, 143, 143, 143, 143, 143, 143, 143, 143, 143, 143,
@@ -314,6 +317,9 @@ void setup_looper_3(void){
 
     looper_set_active_channels(false, false, false, false, true);
 }
+#else
+#error "Either USE_LOOPER_1, USE_LOOPER_2, or USE_LOOPER_3 must be defined for main.c"
+#endif
 
 int main(int argc, char *argv[]) {
     setup_looper();
