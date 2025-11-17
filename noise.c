@@ -40,7 +40,7 @@ static const uint8_t noise_data[NOISE_DATA_LENGTH] = {
 #endif
 
 
-static uint32_t current_sample = 0;
+static uint16_t current_sample = 0;
 
 static uint8_t amplitude = 255;
 

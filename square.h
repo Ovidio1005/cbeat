@@ -31,14 +31,14 @@ void square_set_duty_cycle(uint8_t duty);
  * @brief Get the current frequency of the square wave.
  * @return The frequency in Hz.
  */
-uint32_t square_frequency(void);
+uint16_t square_frequency(void);
 /**
  * @brief Set the frequency of the square wave.
  * @details The waveform will loop every `SAMPLE_RATE / frequency` samples.
  * @sa `SAMPLE_RATE` defined in macros.h
  * @param frequency The desired frequency in Hz.
  */
-void square_set_frequency(uint32_t frequency);
+void square_set_frequency(uint16_t frequency);
 
 /**
  * @brief Get the current amplitude of the triangle wave.

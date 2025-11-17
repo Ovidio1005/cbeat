@@ -72,17 +72,13 @@ void setup_looper(void){
         true, true, false, true, false, true, false, true
     };
 
-    looper_init(BEATS, BPM);
+    looper_init(BEATS, BPM, true, true, true, true, false);
 
     for(int i = 0; i < SIXTEENTHS; i++) {
         NoteAttributes note_attr = {
-            .play = true,
+            .flags = 1 + (note_staccato[i] ? 2 : 0),
             .frequency_start = notes[i],
-            .frequency_end = notes[i],
-            .volume_start = 255,
-            .volume_end = 255,
-            .is_double = false,
-            .staccato = note_staccato[i]
+            .frequency_end = notes[i]
         };
 
         bool n_staccato_before = i == 0 ? true : note_staccato[i - 1];
@@ -92,65 +88,50 @@ void setup_looper(void){
         looper_set_note(i, note_channels[i], note_attr);
 
         NoteAttributes percussion_attr = {
-            .play = percussion[i] != 0,
-            .volume_start = 255,
-            .volume_end = 255,
-            .is_double = false,
-            .staccato = percussion_staccato[i]
+            .flags = (percussion[i] == 0 ? 0 : 1) + (percussion_staccato[i] ? 2 : 0)
         };
 
         bool p_staccato_before = i == 0 ? true : percussion_staccato[i - 1];
 
-        percussion_attr.volume_start = p_staccato_before ? 255 : 192;
-        percussion_attr.volume_end = p_staccato_before ? 192 : 128;
+        percussion_attr.volume_start = p_staccato_before ? 128 : 96;
+        percussion_attr.volume_end = p_staccato_before ? 96 : 64;
 
         looper_set_note(i, NOISE, percussion_attr);
     }
-
-    looper_set_active_channels(true, true, true, true, false);
-    looper_set_channel_amplitude(NOISE, 128);
 }
 #elif defined(USE_LOOPER_2)
 /**
  * @brief Sets up the looper to test changes in frequency and volume within notes.
  */
 void setup_looper(void){
-    looper_init(4, 60);
+    looper_init(4, 60, true, true, true, true, false);
     NoteAttributes n1 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 200,
         .frequency_end = 400,
         .volume_start = 255,
         .volume_end = 192,
-        .is_double = false,
-        .staccato = false
     };
     NoteAttributes n2 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 400,
         .frequency_end = 800,
         .volume_start = 192,
         .volume_end = 128,
-        .is_double = false,
-        .staccato = false
     };
     NoteAttributes n3 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 800,
         .frequency_end = 200,
         .volume_start = 128,
         .volume_end = 255,
-        .is_double = false,
-        .staccato = false
     };
     NoteAttributes n4 = {
-        .play = true,
+        .flags = 3, // Staccato
         .frequency_start = 200,
         .frequency_end = 200,
         .volume_start = 255,
         .volume_end = 255,
-        .is_double = false,
-        .staccato = true
     };
 
     NoteAttributes narr[4] = {n1, n2, n3, n4};
@@ -161,8 +142,6 @@ void setup_looper(void){
         looper_set_note(i+8, TRIANGLE, narr[i]);
         looper_set_note(i+12, NOISE, narr[i]);
     }
-
-    looper_set_active_channels(true, true, true, true, false);
 }
 #elif defined(USE_LOOPER_3)
 /**
@@ -272,50 +251,40 @@ void setup_looper(void){
         119, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 121, 121, 121, 121, 121, 121, 121, 121, 121, 121, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 124, 124, 124, 124, 124, 124, 124, 124, 124, 124, 125, 125, 125, 125, 125, 125, 125, 125, 125, 125, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 127, 127, 127, 127, 127, 127, 127, 127, 127
     };
 
-    looper_init(1, 30);
+    looper_init(1, 30, false, false, false, false, true);
     custom_set_data(sine_samples, 8000);
 
     NoteAttributes n1 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 100,
         .frequency_end = 400,
         .volume_start = 255,
         .volume_end = 192,
-        .is_double = false,
-        .staccato = false
     };
     NoteAttributes n2 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 400,
         .frequency_end = 1600,
         .volume_start = 192,
         .volume_end = 128,
-        .is_double = false,
-        .staccato = false
     };
     NoteAttributes n3 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 1600,
         .frequency_end = 200,
         .volume_start = 128,
         .volume_end = 255,
-        .is_double = false,
-        .staccato = false
     };
     NoteAttributes n4 = {
-        .play = true,
+        .flags = 1,
         .frequency_start = 200,
         .frequency_end = 200,
         .volume_start = 255,
         .volume_end = 255,
-        .is_double = false,
-        .staccato = false
     };
 
     NoteAttributes narr[4] = {n1, n2, n3, n4};
     looper_set_notes(0, 4, CUSTOM, narr);
-
-    looper_set_active_channels(false, false, false, false, true);
 }
 #else
 #error "Either USE_LOOPER_1, USE_LOOPER_2, or USE_LOOPER_3 must be defined for main.c"

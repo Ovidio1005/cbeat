@@ -29,7 +29,7 @@
  * @param data Pointer to an array of unsigned 8-bit integers representing the waveform data.
  * @param length The number of samples provided in the data array.
  */
-void custom_set_data(const uint8_t* data, uint32_t length);
+void custom_set_data(const uint8_t* data, uint16_t length);
 
 /**
  * @brief Free the memory allocated for the custom waveform data.
@@ -42,14 +42,14 @@ void custom_free(void);
  * @brief Get the current frequency of the custom waveform.
  * @return The frequency in Hz.
  */
-uint32_t custom_frequency(void);
+uint16_t custom_frequency(void);
 /**
  * @brief Set the frequency of the custom waveform.
  * @details The waveform will loop every `SAMPLE_RATE / frequency` samples.
  * @sa `SAMPLE_RATE` defined in macros.h
  * @param frequency The desired frequency in Hz.
  */
-void custom_set_frequency(uint32_t frequency);
+void custom_set_frequency(uint16_t frequency);
 
 /**
  * @brief Get the current amplitude of the custom waveform.

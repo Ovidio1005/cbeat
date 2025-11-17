@@ -11,33 +11,34 @@
  * @date 2025-11-15
  */
 
+// TODO: Update documentation to reflect the following changes:
+// - In the looper, require the active channels to be set on initialization, and allocate note arrays only for those channels
+// - Get rid of the channel-amplitude logic - we already have volume per note
+// - Condense `play`, `is_double`, and `staccato` into a single `uint8_t` bitmask to save 2 bytes per note
+
 #include <stdint.h>
 #include <stdbool.h>
-
-/**
- * @brief Default amplitude for all channels.
- */
-#define DEFAULT_CHANNEL_AMPLITUDE 255
 
 /**
  * @brief Attributes defining a (portion of a) musical note.
  */
 typedef struct note_attributes {
-    /** If set to false, the note represents a pause and every other attribute is ignored. */
-    bool play;
+    /** Bitmask of flags for note properties.
+     * 
+     * Bit 0: Play - If set to false (0), the note represents a pause and every other attribute is ignored.
+     * Bit 1: Staccato - Set to false (0) to chain multiple notes into a single, longer note; set to true (1) to add a short pause between notes.
+     * Bit 2: Double Note - If set to true (1), a small pause is added to the middle of the note, effectively turning it into two shorter notes.
+     */
+    uint8_t flags;
 
     /** The starting frequency of the note in Hz. */
-    uint32_t frequency_start;
+    uint16_t frequency_start;
     /** The ending frequency of the note in Hz. */
-    uint32_t frequency_end;
+    uint16_t frequency_end;
     /** The starting volume of the note (0-255). */
     uint8_t volume_start;
     /** The ending volume of the note (0-255). */
     uint8_t volume_end;
-    /** Set to false to chain multiple notes into a single, longer note; set to true to add a short pause between notes. */
-    bool staccato;
-    /** If set to true, a small pause is added to the middle of the note, effectively turning it into two shorter notes. */
-    bool is_double;
 } NoteAttributes;
 
 /**
@@ -57,17 +58,28 @@ typedef enum channel {
  * @details This function allocate the necessary memory and sets the current step to the beginning of the loop.
  * It must be called before any other function in this module.
  * 
- * The contents of the loop for each channel are set to all pauses by default.
+ * The contents of the loop for each active channel are set to all pauses by default.
+ * Memory for the inactive channels is not allocated, so they should not be used.
+ * The number of active channels is used to scale the final waveform output.
  * 
  * This function does not free any previously allocated memory;
  * looper_free() must be called before calling this function again.
  * 
  * @sa `looper_free()`
+ * @sa `looper_set_channel_amplitude()`
  * 
  * @param length_beats Length of the loop in beats.
- * @param tempo_bpm_value Tempo in beats per minute.
+ * @param tempo_bpm Tempo in beats per minute.
+ * @param square_enabled Whether the square channel is active.
+ * @param sawtooth_enabled Whether the sawtooth channel is active.
+ * @param triangle_enabled Whether the triangle channel is active.
+ * @param noise_enabled Whether the noise channel is active.
+ * @param custom_enabled Whether the custom channel is active.
  */
-void looper_init(uint32_t length_beats, uint32_t tempo_bpm_value);
+void looper_init(
+    uint16_t length_beats, uint16_t tempo_bpm,
+    bool square_enabled, bool sawtooth_enabled, bool triangle_enabled, bool noise_enabled, bool custom_enabled
+);
 
 /**
  * @brief Frees all allocated resources used by the looper.
@@ -82,29 +94,13 @@ void looper_init(uint32_t length_beats, uint32_t tempo_bpm_value);
 void looper_free(void);
 
 /**
- * @brief Sets which channels are active in the looper.
- * 
- * @details Inactive channels will be muted, even if there are notes for them.
- * The number of active channels is used to scale the final waveform output.
- * 
- * @sa `looper_set_channel_amplitude()`
- * 
- * @param square Whether the square channel is active.
- * @param sawtooth Whether the sawtooth channel is active.
- * @param triangle Whether the triangle channel is active.
- * @param noise Whether the noise channel is active.
- * @param custom Whether the custom channel is active.
- */
-void looper_set_active_channels(bool square, bool sawtooth, bool triangle, bool noise, bool custom);
-
-/**
  * @brief Sets the note attributes for a specific sixteenth note on a given channel.
  * 
  * @param sixteenth The sixteenth note index within the loop to set the note for.
  * @param channel The waveform channel to set the note on.
  * @param attributes The attributes of the note to set.
  */
-void looper_set_note(uint32_t sixteenth, Channel channel, NoteAttributes attributes);
+void looper_set_note(uint16_t sixteenth, Channel channel, NoteAttributes attributes);
 
 /**
  * @brief Sets the note attributes for a range of sixteenth notes on a given channel.
@@ -114,7 +110,7 @@ void looper_set_note(uint32_t sixteenth, Channel channel, NoteAttributes attribu
  * @param channel The waveform channel to set the notes on.
  * @param attributes The attributes of the notes to set.
  */
-void looper_set_notes_equal(uint32_t start_sixteenth, uint32_t length_sixteenths, Channel channel, NoteAttributes attributes);
+void looper_set_notes_equal(uint16_t start_sixteenth, uint16_t length_sixteenths, Channel channel, NoteAttributes attributes);
 
 /**
  * @brief Sets the note attributes for a range of sixteenth notes on a given channel using an array of note attributes.
@@ -124,27 +120,28 @@ void looper_set_notes_equal(uint32_t start_sixteenth, uint32_t length_sixteenths
  * @param channel The waveform channel to set the notes on.
  * @param notes_array An array of NoteAttributes structures containing the attributes for each sixteenth note.
  */
-void looper_set_notes(uint32_t start_sixteenth, uint32_t length_sixteenths, Channel channel, NoteAttributes* notes_array);
+void looper_set_notes(uint16_t start_sixteenth, uint16_t length_sixteenths, Channel channel, NoteAttributes* notes_array);
 
 /**
  * @brief Changes the tempo of the looper.
  * 
  * @param new_tempo_bpm The new tempo in beats per minute.
  */
-void looper_change_tempo(uint32_t new_tempo_bpm);
+void looper_change_tempo(uint16_t new_tempo_bpm);
 
-/**
- * @brief Sets the amplitude for a specific waveform channel.
- * 
- * @details The final waveform output is a sum of all channels, each
- * scaled by its amplitude, and divided by the active channel count.
- * 
- * @sa `looper_set_active_channels()`
- * 
- * @param channel The waveform channel to set the amplitude for.
- * @param amplitude The amplitude value (0-255).
- */
-void looper_set_channel_amplitude(Channel channel, uint8_t amplitude);
+// TODO: remove after changing the rest of the documentation (kept for reference for now)
+// /**
+//  * @brief Sets the amplitude for a specific waveform channel.
+//  * 
+//  * @details The final waveform output is a sum of all channels, each
+//  * scaled by its amplitude, and divided by the active channel count.
+//  * 
+//  * @sa `looper_set_active_channels()`
+//  * 
+//  * @param channel The waveform channel to set the amplitude for.
+//  * @param amplitude The amplitude value (0-255).
+//  */
+// void looper_set_channel_amplitude(Channel channel, uint8_t amplitude);
 
 /**
  * @brief Computes the value of the combined waveform output at the current sample, and advances to the next sample.
@@ -169,14 +166,14 @@ uint32_t looper_current_sample(void);
  * 
  * @return The current sixteenth note index within the loop.
  */
-uint32_t looper_current_sixteenth(void);
+uint16_t looper_current_sixteenth(void);
 
 /**
  * @brief Retrieves the current beat position within the loop.
  * 
  * @return The current beat index within the loop.
  */
-uint32_t looper_current_beat(void);
+uint16_t looper_current_beat(void);
 
 /**
  * @brief Sets the current position within the loop to the specified sample index.
@@ -190,14 +187,14 @@ void looper_to_sample(uint32_t sample);
  * 
  * @param sixteenth The sixteenth note index to set the current position to.
  */
-void looper_to_sixteenth(uint32_t sixteenth);
+void looper_to_sixteenth(uint16_t sixteenth);
 
 /**
  * @brief Sets the current position within the loop to the beginning of the specified beat.
  * 
  * @param beat The beat index to set the current position to.
  */
-void looper_to_beat(uint32_t beat);
+void looper_to_beat(uint16_t beat);
 
 /**
  * @brief Restarts the loop, setting the current position to the beginning.

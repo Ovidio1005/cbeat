@@ -9,16 +9,6 @@
 #include <stdint.h>
 
 /**
- * @brief Linearly interpolates between two 32-bit unsigned integers.
- * @details The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
- * @param start The starting value.
- * @param end The ending value.
- * @param position The current position in the interpolation, between 0 and `length`.
- * @param length The total length of the interpolation.
- * @return The interpolated 32-bit unsigned integer.
- */
-uint32_t linear_interpolate_32(uint32_t start, uint32_t end, uint32_t position, uint32_t length);
-/**
  * @brief Linearly interpolates between two 16-bit unsigned integers.
  * @details The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
  * @param start The starting value.
@@ -27,7 +17,7 @@ uint32_t linear_interpolate_32(uint32_t start, uint32_t end, uint32_t position, 
  * @param length The total length of the interpolation.
  * @return The interpolated 16-bit unsigned integer.
  */
-uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint32_t position, uint32_t length);
+uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint16_t position, uint16_t length);
 /**
  * @brief Linearly interpolates between two 8-bit unsigned integers.
  * @details The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
@@ -37,7 +27,7 @@ uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint32_t position, 
  * @param length The total length of the interpolation.
  * @return The interpolated 8-bit unsigned integer.
  */
-uint8_t linear_interpolate_8(uint8_t start, uint8_t end, uint32_t position, uint32_t length);
+uint8_t linear_interpolate_8(uint8_t start, uint8_t end, uint16_t position, uint16_t length);
 
 /**
  * @brief Applies amplitude scaling to an 8-bit audio sample.

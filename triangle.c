@@ -2,18 +2,18 @@
 #include "macros.h"
 #include "utils.h"
 
-static const uint32_t HALF_CYCLE = SAMPLE_RATE / 2;
+static const uint16_t HALF_CYCLE = SAMPLE_RATE / 2;
 
-static uint32_t current_sample = 0;
+static uint16_t current_sample = 0;
 
-static uint32_t samples_per_step = 1;
+static uint16_t samples_per_step = 1;
 static uint8_t amplitude = 255;
 
-uint32_t triangle_frequency(void) {
+uint16_t triangle_frequency(void) {
     return samples_per_step;
 }
 
-void triangle_set_frequency(uint32_t frequency) {
+void triangle_set_frequency(uint16_t frequency) {
     samples_per_step = frequency;
 }
 

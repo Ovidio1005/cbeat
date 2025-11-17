@@ -2,16 +2,16 @@
 #include "macros.h"
 #include "utils.h"
 
-static uint32_t current_sample = 0;
+static uint16_t current_sample = 0;
 
-static uint32_t samples_per_step = 1;
+static uint16_t samples_per_step = 1;
 static uint8_t amplitude = 255;
 
-uint32_t sawtooth_frequency(void) {
+uint16_t sawtooth_frequency(void) {
     return samples_per_step;
 }
 
-void sawtooth_set_frequency(uint32_t frequency) {
+void sawtooth_set_frequency(uint16_t frequency) {
     samples_per_step = frequency;
 }
 

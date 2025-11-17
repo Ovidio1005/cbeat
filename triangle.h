@@ -20,14 +20,14 @@
  * @brief Get the current frequency of the triangle wave.
  * @return The frequency in Hz.
  */
-uint32_t triangle_frequency(void);
+uint16_t triangle_frequency(void);
 /**
  * @brief Set the frequency of the triangle wave.
  * @details The waveform will loop every `SAMPLE_RATE / frequency` samples.
  * @sa `SAMPLE_RATE` defined in macros.h
  * @param frequency The desired frequency in Hz.
  */
-void triangle_set_frequency(uint32_t frequency);
+void triangle_set_frequency(uint16_t frequency);
 
 /**
  * @brief Get the current amplitude of the triangle wave.

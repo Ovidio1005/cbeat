@@ -4,15 +4,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static uint32_t current_sample = 0;
+static uint16_t current_sample = 0;
 
 static uint8_t* audio_data = NULL;
-static uint32_t audio_data_length = 0;
+static uint16_t audio_data_length = 0;
 
-static uint32_t samples_per_step = 1;
+static uint16_t samples_per_step = 1;
 static uint8_t amplitude = 255;
 
-void custom_set_data(const uint8_t* data, uint32_t length) {
+void custom_set_data(const uint8_t* data, uint16_t length) {
     audio_data_length = length;
     audio_data = (uint8_t*)malloc(SAMPLE_RATE * sizeof(uint8_t));
 
@@ -27,11 +27,11 @@ void custom_set_data(const uint8_t* data, uint32_t length) {
     }
 }
 
-uint32_t custom_frequency(void) {
+uint16_t custom_frequency(void) {
     return samples_per_step;
 }
 
-void custom_set_frequency(uint32_t frequency) {
+void custom_set_frequency(uint16_t frequency) {
     samples_per_step = frequency;
 }
 

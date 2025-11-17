@@ -20,14 +20,14 @@
  * @brief Get the current frequency of the sawtooth wave.
  * @return The frequency in Hz.
  */
-uint32_t sawtooth_frequency(void);
+uint16_t sawtooth_frequency(void);
 /**
  * @brief Set the frequency of the sawtooth wave.
  * @details The waveform will loop every `SAMPLE_RATE / frequency` samples.
  * @sa `SAMPLE_RATE` defined in macros.h
  * @param frequency The desired frequency in Hz.
  */
-void sawtooth_set_frequency(uint32_t frequency);
+void sawtooth_set_frequency(uint16_t frequency);
 
 /**
  * @brief Get the current amplitude of the sawtooth wave.

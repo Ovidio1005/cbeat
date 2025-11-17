@@ -2,12 +2,12 @@
 #include "macros.h"
 #include "utils.h"
 
-static uint32_t current_sample = 0;
+static uint16_t current_sample = 0;
 
 static uint8_t duty_cycle = 127; // 50% duty cycle
-static uint32_t cutoff_sample = SAMPLE_RATE / 2; // Before cutoff = high, after = low. Recalculated in set_duty_cycle
+static uint16_t cutoff_sample = SAMPLE_RATE / 2; // Before cutoff = high, after = low. Recalculated in set_duty_cycle
 
-static uint32_t samples_per_step = 1;
+static uint16_t samples_per_step = 1;
 static uint8_t amplitude = 255;
 
 uint8_t square_duty_cycle(void) {
@@ -19,11 +19,11 @@ void square_set_duty_cycle(uint8_t duty) {
     cutoff_sample = (samples_per_step * duty_cycle) / 255;
 }
 
-uint32_t square_frequency(void) {
+uint16_t square_frequency(void) {
     return samples_per_step;
 }
 
-void square_set_frequency(uint32_t frequency) {
+void square_set_frequency(uint16_t frequency) {
     samples_per_step = frequency;
 }
 
