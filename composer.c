@@ -1,0 +1,14 @@
+#include "composer.h"
+#include "macros.h"
+
+static const uint16_t NOTES = {
+    C_0, CSHARP_0, D_0, DSHARP_0, E_0, F_0, FSHARP_0, G_0, GSHARP_0, A_0, ASHARP_0, B_0,
+    C_1, CSHARP_1, D_1, DSHARP_1, E_1, F_1, FSHARP_1, G_1, GSHARP_1, A_1, ASHARP_1, B_1,
+    C_2, CSHARP_2, D_2, DSHARP_2, E_2, F_2, FSHARP_2, G_2, GSHARP_2, A_2, ASHARP_2, B_2,
+    C_3, CSHARP_3, D_3, DSHARP_3, E_3, F_3, FSHARP_3, G_3, GSHARP_3, A_3, ASHARP_3, B_3,
+    C_4, CSHARP_4, D_4, DSHARP_4, E_4, F_4, FSHARP_4, G_4, GSHARP_4, A_4, ASHARP_4, B_4,
+    C_5, CSHARP_5, D_5, DSHARP_5, E_5, F_5, FSHARP_5, G_5, GSHARP_5, A_5, ASHARP_5, B_5,
+    C_6, CSHARP_6, D_6, DSHARP_6, E_6, F_6, FSHARP_6, G_6, GSHARP_6, A_6, ASHARP_6, B_6,
+    C_7, CSHARP_7, D_7, DSHARP_7, E_7, F_7, FSHARP_7, G_7, GSHARP_7, A_7, ASHARP_7, B_7,
+    C_8, CSHARP_8, D_8, DSHARP_8, E_8, F_8, FSHARP_8, G_8, GSHARP_8, A_8, ASHARP_8, B_8
+};

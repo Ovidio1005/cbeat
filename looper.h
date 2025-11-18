@@ -123,6 +123,17 @@ void looper_set_notes_equal(uint16_t start_sixteenth, uint16_t length_sixteenths
 void looper_set_notes(uint16_t start_sixteenth, uint16_t length_sixteenths, Channel channel, NoteAttributes* notes_array);
 
 /**
+ * @brief Reads the note attributes for a range of sixteenth notes on a given channel into an output array.
+ * 
+ * @param start_sixteenth The starting sixteenth note index within the loop to read the notes from.
+ * @param length_sixteenths The number of sixteenth notes to read.
+ * @param channel The waveform channel to read the notes from.
+ * @param out_notes_array An array of NoteAttributes structures to store the read attributes. Must be at least length_sixteenths in size.
+ * @return The number of notes read and stored in out_notes_array.
+ */
+uint16_t looper_read_notes(uint16_t start_sixteenth, uint16_t length_sixteenths, Channel channel, NoteAttributes* out_notes_array);
+
+/**
  * @brief Changes the tempo of the looper.
  * 
  * @param new_tempo_bpm The new tempo in beats per minute.
