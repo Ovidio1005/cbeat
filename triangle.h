@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file triangle.h
  * @brief Header file for triangle wave generator functions.

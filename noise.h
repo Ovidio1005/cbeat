@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file noise.h
  * @brief Header file for noise waveform generator functions.

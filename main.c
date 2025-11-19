@@ -1,15 +1,20 @@
 #include "macros.h"
 #include "looper.h"
+#include "composer.h"
 #include "custom.h"
 #include <stdio.h>
 #include <stdbool.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#else
 #include <linux/time.h>
+#endif
 
 #define BPM 117
 #define BEATS 16
 #define SIXTEENTHS (BEATS * 4)
 
-#define USE_LOOPER_1
+#define USE_LOOPER_4
 
 #ifdef USE_LOOPER_1
 /**
@@ -286,13 +291,55 @@ void setup_looper(void){
     NoteAttributes narr[4] = {n1, n2, n3, n4};
     looper_set_notes(0, 4, CUSTOM, narr);
 }
+#elif defined(USE_LOOPER_4)
+/**
+ * @brief Sets up the looper to test `composer.c` functionality.
+ */
+void setup_looper() {
+    looper_init(32, 120, true, true, true, true, false);
+
+    composer_set_note(SQUARE, 0, 0, 8, 255, CONSTANT, false, false, A_4);
+    composer_set_note(SQUARE, 2, 0, 8, 255, DECAY_SLOW, false, false, A_4);
+    composer_set_note(SQUARE, 4, 0, 8, 255, DECAY_MEDIUM, false, false, A_4);
+    composer_set_note(SQUARE, 6, 0, 8, 255, DECAY_FAST, false, false, A_4);
+    composer_set_note(SQUARE, 8, 0, 8, 255, HIT, false, false, A_4);
+    
+    composer_set_notes(TRIANGLE, 10, 0, 4, 255, DECAY_SLOW, false, false, A_4, B_4, C_4, D_5);
+    composer_copy_section(TRIANGLE, 10, 0, SQUARE, 10, 0, 16);
+    composer_shift_semitones(SQUARE, 10, 0, 16, -5);
+
+    composer_set_glissando(SQUARE, 14, 0, 8, 255, CONSTANT, false, false, composer_get_note_index(A_4), 2);
+    composer_set_glissando(SQUARE, 18, 0, 8, 255, CONSTANT, true, true, composer_get_note_index(A_4), 1);
+}
 #else
 #error "Either USE_LOOPER_1, USE_LOOPER_2, or USE_LOOPER_3 must be defined for main.c"
 #endif
 
 int main(int argc, char *argv[]) {
     setup_looper();
-    
+    #if defined(_WIN32) || defined(_WIN64)
+    const uint64_t interval_us = 1000000 / SAMPLE_RATE;
+
+    LARGE_INTEGER freq;
+    LARGE_INTEGER next;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&next);
+
+    while (1) {
+        uint8_t value = looper_step();
+        fputc(value, stdout);
+        fflush(stdout);
+
+        // advance next deadline
+        next.QuadPart += (interval_us * freq.QuadPart) / 1000000;
+
+        // busy-wait cause I can't be arsed to do better for Windows
+        LARGE_INTEGER now;
+        do {
+            QueryPerformanceCounter(&now);
+        } while (now.QuadPart < next.QuadPart);
+    }
+    #else
     const __useconds_t interval_us = 1000000 / SAMPLE_RATE;
     struct timespec next;
     clock_gettime(CLOCK_MONOTONIC, &next);
@@ -312,6 +359,7 @@ int main(int argc, char *argv[]) {
         // sleep until that absolute time
         clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next, NULL);
     }
+    #endif
 
     return 0;
 }

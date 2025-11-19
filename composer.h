@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file composer.h
  * 
@@ -5,11 +7,15 @@
  * @date 2025-11-18
  */
 
+ // TODO: Documentation
+
 #include "looper.h"
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdarg.h>
 
-#define DECAY_MIN_VOLUME 128
-#define HIT_MIN_VOLUME 64
+#define DECAY_VOLUME_FACTOR 2
+#define HIT_VOLUME_FACTOR 4
 #define DECAY_SLOW_SAMPLES 16000
 #define DECAY_MEDIUM_SAMPLES 4000
 #define DECAY_FAST_SAMPLES 1000
@@ -70,7 +76,7 @@ void composer_set_glissando(
     Channel channel,
     uint16_t start_beat, uint16_t start_sixteenth, uint16_t length_sixteenths,
     uint8_t volume, Envelope envelope, bool staccato, bool doubles,
-    int start_note_index, int note_index_step, int count
+    int start_note_index, int note_index_step
 );
 
 void composer_apply_dynamics(
@@ -83,4 +89,16 @@ void composer_copy_section(
     Channel src_channel, uint16_t src_start_beat, uint16_t src_start_sixteenth,
     Channel dest_channel, uint16_t dest_start_beat, uint16_t dest_start_sixteenth,
     uint16_t length_sixteenths
+);
+
+void composer_shift_semitones(
+    Channel channel,
+    uint16_t start_beat, uint16_t start_sixteenth, uint16_t length_sixteenths,
+    int semitone_shift
+);
+
+void composer_shift_octaves(
+    Channel channel,
+    uint16_t start_beat, uint16_t start_sixteenth, uint16_t length_sixteenths,
+    int octave_shift
 );

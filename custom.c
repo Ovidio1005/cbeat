@@ -1,6 +1,8 @@
 #include "custom.h"
 #include "macros.h"
 #include "utils.h"
+
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 

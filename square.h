@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file square.h
  * @brief Header file for square wave generator functions.

@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file looper.h
  * @brief Header file for the looper module, which manages a multi-channel audio looper.
@@ -139,6 +141,13 @@ uint16_t looper_read_notes(uint16_t start_sixteenth, uint16_t length_sixteenths,
  * @param new_tempo_bpm The new tempo in beats per minute.
  */
 void looper_change_tempo(uint16_t new_tempo_bpm);
+
+/**
+ * @brief Retrieves the number of samples per sixteenth note at the current tempo.
+ * 
+ * @return The number of samples per sixteenth note.
+ */
+uint16_t looper_samples_per_sixteenth(void);
 
 // TODO: remove after changing the rest of the documentation (kept for reference for now)
 // /**

@@ -2,6 +2,8 @@
 #include "macros.h"
 #include "utils.h"
 
+#include <stdint.h>
+
 #define LONG_NOISE_DATA_LENGTH 1024
 #define SHORT_NOISE_DATA_LENGTH 256
 

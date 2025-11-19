@@ -1,3 +1,5 @@
+#pragma once
+
 /** 
  * @file macros.h
  * @brief Macros used across the project: sample rate and musical note frequency definitions from C0 to B8.

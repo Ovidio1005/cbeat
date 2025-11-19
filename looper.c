@@ -8,6 +8,8 @@
 #include "noise.h"
 #include "custom.h"
 
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -173,6 +175,39 @@ void looper_set_notes(uint16_t start_sixteenth, uint16_t length_sixteenths, Chan
     }
 }
 
+uint16_t looper_read_notes(uint16_t start_sixteenth, uint16_t length_sixteenths, Channel channel, NoteAttributes* out_notes_array){
+    NoteAttributes* source_array = NULL;
+    switch(channel) {
+        case SQUARE:
+            source_array = square_notes;
+            break;
+        case SAWTOOTH:
+            source_array = sawtooth_notes;
+            break;
+        case TRIANGLE:
+            source_array = triangle_notes;
+            break;
+        case NOISE:
+            source_array = noise_notes;
+            break;
+        case CUSTOM:
+            source_array = custom_notes;
+            break;
+        default:
+            return 0; // Invalid channel
+    }
+
+    if(!source_array || start_sixteenth >= loop_length_sixteenths) return 0; // Out of bounds or channel not enabled
+
+    uint16_t available = loop_length_sixteenths - start_sixteenth;
+    uint16_t i;
+    for(i = 0; i < length_sixteenths && i < available; i++) {
+        out_notes_array[i] = source_array[start_sixteenth + i];
+    }
+
+    return i; // Number of notes read
+}
+
 void looper_change_tempo(uint16_t new_tempo_bpm) {
     uint16_t new_samples_per_sixteenth = (SAMPLE_RATE * 60) / (new_tempo_bpm * 4);
 
@@ -181,6 +216,10 @@ void looper_change_tempo(uint16_t new_tempo_bpm) {
 
     samples_per_sixteenth = new_samples_per_sixteenth;
     loop_length_samples = samples_per_sixteenth * loop_length_sixteenths;
+}
+
+uint16_t looper_samples_per_sixteenth(void) {
+    return samples_per_sixteenth;
 }
 
 uint8_t looper_step(void) {

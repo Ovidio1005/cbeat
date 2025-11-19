@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file custom.h
  * @brief Header file for custom waveform generator functions.

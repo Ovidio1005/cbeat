@@ -2,6 +2,8 @@
 #include "macros.h"
 #include "utils.h"
 
+#include <stdint.h>
+
 static const uint16_t HALF_CYCLE = SAMPLE_RATE / 2;
 
 static uint16_t current_sample = 0;

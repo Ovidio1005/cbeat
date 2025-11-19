@@ -2,6 +2,8 @@
 #include "macros.h"
 #include "utils.h"
 
+#include <stdint.h>
+
 static uint16_t current_sample = 0;
 
 static uint16_t samples_per_step = 1;

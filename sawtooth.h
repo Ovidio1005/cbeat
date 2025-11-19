@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @file sawtooth.h
  * @brief Header file for sawtooth wave generator functions.
