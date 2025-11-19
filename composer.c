@@ -22,7 +22,7 @@ uint8_t apply_envelope(Envelope envelope, uint8_t volume, uint32_t sample) {
     if(sample > 0xFFFF) sample = 0xFFFF;
 
     uint8_t min_volume;
-    uint16_t decay_length;
+    uint32_t decay_length;
 
     switch(envelope) {
         case CONSTANT:
@@ -48,12 +48,16 @@ uint8_t apply_envelope(Envelope envelope, uint8_t volume, uint32_t sample) {
     }
 
     // Note: the function already clamps position to [0, length]
-    return quadratic_interpolate_8(volume, min_volume, sample, decay_length);
+    if(envelope == HIT) {
+        return quadratic_interpolate_8(volume, min_volume, sample, decay_length);
+    } else {
+        return linear_interpolate_8(volume, min_volume, sample, decay_length);
+    }
 }
 
 int composer_get_note_index(uint16_t frequency) {
     for (int i = 0; i < sizeof(NOTES) / sizeof(uint16_t); i++) {
-        if (NOTES[i] == frequency) {
+        if (NOTES[i] >= frequency) {
             return i;
         }
     }
@@ -74,8 +78,8 @@ void composer_set_note(
     uint16_t frequency
 ){
     for(int i = 0; i < length_sixteenths; i++) {
-        uint16_t sixteenth = start_beat * 4 + start_sixteenth + i;
-        uint32_t sample_in_note = looper_samples_per_sixteenth() * i;
+        uint16_t sixteenth = (start_beat * 4) + start_sixteenth + i;
+        uint32_t sample_in_note = (uint32_t)looper_samples_per_sixteenth() * i;
         
         NoteAttributes attrs = {
             .flags = 1 + (staccato && i == length_sixteenths - 1 ? 2 : 0) + (doubles ? 4 : 0),
@@ -122,16 +126,16 @@ void composer_set_slide(
     uint8_t volume, Envelope envelope, bool staccato, bool doubles,
     uint16_t frequency_start, uint16_t frequency_end
 ){
-    uint32_t length_samples = looper_samples_per_sixteenth() * length_sixteenths;
+    uint32_t length_samples = (uint32_t)looper_samples_per_sixteenth() * (uint32_t)length_sixteenths;
 
     for(int i = 0; i < length_sixteenths; i++) {
-        uint16_t sixteenth = start_beat * 4 + start_sixteenth + i;
-        uint32_t sample_in_note = looper_samples_per_sixteenth() * i;
+        uint16_t sixteenth = (start_beat * 4) + start_sixteenth + i;
+        uint32_t sample_in_note = (uint32_t)looper_samples_per_sixteenth() * i;
         
         NoteAttributes attrs = {
             .flags = 1 + (staccato && i == length_sixteenths - 1 ? 2 : 0) + (doubles ? 4 : 0),
-            .frequency_start = linear_interpolate_16_long(frequency_start, frequency_end, sample_in_note, length_samples),
-            .frequency_end = linear_interpolate_16_long(frequency_start, frequency_end, sample_in_note + looper_samples_per_sixteenth(), length_samples),
+            .frequency_start = linear_interpolate_16(frequency_start, frequency_end, sample_in_note, length_samples),
+            .frequency_end = linear_interpolate_16(frequency_start, frequency_end, sample_in_note + looper_samples_per_sixteenth(), length_samples),
             .volume_start = apply_envelope(envelope, volume, sample_in_note),
             .volume_end = apply_envelope(envelope, volume, sample_in_note + looper_samples_per_sixteenth())
         };
@@ -173,7 +177,7 @@ void composer_set_rest(
     uint16_t start_beat, uint16_t start_sixteenth, uint16_t length_sixteenths
 ){
     for(int i = 0; i < length_sixteenths; i++) {
-        uint16_t sixteenth = start_beat * 4 + start_sixteenth + i;
+        uint16_t sixteenth = (start_beat * 4) + start_sixteenth + i;
         
         NoteAttributes attrs = {
             .flags = 0
@@ -188,7 +192,7 @@ void composer_set_rests(
     uint16_t start_beat, uint16_t start_sixteenth, uint16_t length_sixteenths,
     uint16_t interval_sixteenths, int count
 ){
-    uint16_t sixteenth = start_beat * 4 + start_sixteenth;
+    uint16_t sixteenth = (start_beat) * 4 + start_sixteenth;
 
     for(int i = 0; i < count; i++) {
         composer_set_rest(channel, sixteenth / 4, sixteenth % 4, length_sixteenths);
@@ -203,20 +207,20 @@ void composer_set_glissando(
     int start_note_index, int note_index_step
 ){
     for(int i = 0; i < length_sixteenths; i++) {
-        uint16_t sixteenth = start_beat * 4 + start_sixteenth + i;
-        uint16_t start_freq, end_freq;
+        uint16_t sixteenth = (start_beat * 4) + start_sixteenth + i;
+        uint16_t start_freqency, end_freqency;
         if(doubles) {
-            start_freq = composer_get_frequency(start_note_index + note_index_step * (i * 2));
-            end_freq = composer_get_frequency(start_note_index + note_index_step * (i * 2 + 1));
+            start_freqency = composer_get_frequency(start_note_index + (note_index_step * i * 2));
+            end_freqency = composer_get_frequency(start_note_index + (note_index_step * ((i * 2) + 1)));
         } else {
-            start_freq = composer_get_frequency(start_note_index + note_index_step * i);
-            end_freq = start_freq;
+            start_freqency = composer_get_frequency(start_note_index + (note_index_step * i));
+            end_freqency = start_freqency;
         }
         
         NoteAttributes attrs = {
             .flags = 1 + (staccato && i == length_sixteenths - 1 ? 2 : 0) + (doubles ? 4 : 0),
-            .frequency_start = start_freq,
-            .frequency_end = end_freq,
+            .frequency_start = start_freqency,
+            .frequency_end = end_freqency,
             .volume_start = apply_envelope(envelope, volume, 0),
             .volume_end = apply_envelope(envelope, volume, looper_samples_per_sixteenth())
         };
@@ -231,16 +235,16 @@ void composer_apply_dynamics(
     uint8_t start_volume_factor, uint8_t end_volume_factor
 ){
     NoteAttributes attrs_array[length_sixteenths];
-    looper_read_notes(start_beat * 4 + start_sixteenth, length_sixteenths, channel, attrs_array);
+    int count = looper_read_notes((start_beat * 4) + start_sixteenth, length_sixteenths, channel, attrs_array);
 
-    for(int i = 0; i < length_sixteenths; i++) {
-        attrs_array[i].volume_start = ((uint16_t)attrs_array[i].volume_start * linear_interpolate_16(start_volume_factor, end_volume_factor, i, length_sixteenths)) / 255;
-        attrs_array[i].volume_end = ((uint16_t)attrs_array[i].volume_end * linear_interpolate_16(start_volume_factor, end_volume_factor, i + 1, length_sixteenths)) / 255;
+    for(int i = 0; i < count; i++) {
+        attrs_array[i].volume_start = ((uint16_t)attrs_array[i].volume_start * linear_interpolate_16_short(start_volume_factor, end_volume_factor, i, length_sixteenths)) / 255;
+        attrs_array[i].volume_end = ((uint16_t)attrs_array[i].volume_end * linear_interpolate_16_short(start_volume_factor, end_volume_factor, i + 1, length_sixteenths)) / 255;
     }
 
     looper_set_notes(
-        start_beat * 4 + start_sixteenth,
-        length_sixteenths,
+        (start_beat * 4) + start_sixteenth,
+        count,
         channel,
         attrs_array
     );
@@ -252,10 +256,10 @@ void composer_copy_section(
     uint16_t length_sixteenths
 ){
     NoteAttributes attrs_array[length_sixteenths];
-    looper_read_notes(src_start_beat * 4 + src_start_sixteenth, length_sixteenths, src_channel, attrs_array);
+    int count = looper_read_notes((src_start_beat * 4) + src_start_sixteenth, length_sixteenths, src_channel, attrs_array);
     looper_set_notes(
-        dest_start_beat * 4 + dest_start_sixteenth,
-        length_sixteenths,
+        (dest_start_beat * 4) + dest_start_sixteenth,
+        count,
         dest_channel,
         attrs_array
     );
@@ -268,7 +272,7 @@ void composer_shift_semitones(
     int semitone_shift
 ){
     NoteAttributes attrs_array[length_sixteenths];
-    looper_read_notes(start_beat * 4 + start_sixteenth, length_sixteenths, channel, attrs_array);
+    int count = looper_read_notes((start_beat * 4) + start_sixteenth, length_sixteenths, channel, attrs_array);
 
     for(int i = 0; i < length_sixteenths; i++) {
         attrs_array[i].frequency_start = composer_get_frequency(composer_get_note_index(attrs_array[i].frequency_start) + semitone_shift);
@@ -276,8 +280,8 @@ void composer_shift_semitones(
     }
 
     looper_set_notes(
-        start_beat * 4 + start_sixteenth,
-        length_sixteenths,
+        (start_beat * 4) + start_sixteenth,
+        count,
         channel,
         attrs_array
     );
@@ -291,9 +295,9 @@ void composer_shift_octaves(
     if(octave_shift == 0) return;
 
     NoteAttributes attrs_array[length_sixteenths];
-    looper_read_notes(start_beat * 4 + start_sixteenth, length_sixteenths, channel, attrs_array);
+    int count = looper_read_notes((start_beat * 4) + start_sixteenth, length_sixteenths, channel, attrs_array);
 
-    for(int i = 0; i < length_sixteenths; i++) {
+    for(int i = 0; i < count; i++) {
         if(octave_shift >= 0) {
             attrs_array[i].frequency_start *= (1 << octave_shift);
             attrs_array[i].frequency_end *= (1 << octave_shift);
@@ -304,8 +308,8 @@ void composer_shift_octaves(
     }
 
     looper_set_notes(
-        start_beat * 4 + start_sixteenth,
-        length_sixteenths,
+        (start_beat * 4) + start_sixteenth,
+        count,
         channel,
         attrs_array
     );

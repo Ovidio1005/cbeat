@@ -296,20 +296,28 @@ void setup_looper(void){
  * @brief Sets up the looper to test `composer.c` functionality.
  */
 void setup_looper() {
-    looper_init(32, 120, true, true, true, true, false);
+    looper_init(40, 120, true, true, true, true, false);
 
-    composer_set_note(SQUARE, 0, 0, 8, 255, CONSTANT, false, false, A_4);
-    composer_set_note(SQUARE, 2, 0, 8, 255, DECAY_SLOW, false, false, A_4);
-    composer_set_note(SQUARE, 4, 0, 8, 255, DECAY_MEDIUM, false, false, A_4);
-    composer_set_note(SQUARE, 6, 0, 8, 255, DECAY_FAST, false, false, A_4);
-    composer_set_note(SQUARE, 8, 0, 8, 255, HIT, false, false, A_4);
+    composer_set_note(SQUARE, 0, 0, 16, 255, CONSTANT, true, false, A_4);
+    composer_set_note(SQUARE, 4, 0, 16, 255, DECAY_SLOW, true, false, A_4);
+    composer_set_note(SQUARE, 8, 0, 16, 255, DECAY_MEDIUM, true, false, A_4);
+    composer_set_note(SQUARE, 12, 0, 16, 255, DECAY_FAST, true, false, A_4);
+    composer_set_note(SQUARE, 16, 0, 16, 255, HIT, true, false, A_4);
     
-    composer_set_notes(TRIANGLE, 10, 0, 4, 255, DECAY_SLOW, false, false, A_4, B_4, C_4, D_5);
-    composer_copy_section(TRIANGLE, 10, 0, SQUARE, 10, 0, 16);
-    composer_shift_semitones(SQUARE, 10, 0, 16, -5);
+    composer_set_notes(TRIANGLE, 20, 0, 4, 255, DECAY_MEDIUM, false, false, 8, A_4, B_4, C_4, D_5, A_5, B_5, D_6, B_5);
+    composer_apply_dynamics(TRIANGLE, 20, 0, 16, 0, 255);
+    composer_apply_dynamics(TRIANGLE, 26, 0, 8, 255, 128);
+    composer_copy_section(TRIANGLE, 20, 0, SQUARE, 20, 0, 32);
+    composer_shift_semitones(SQUARE, 20, 0, 32, -5);
 
-    composer_set_glissando(SQUARE, 14, 0, 8, 255, CONSTANT, false, false, composer_get_note_index(A_4), 2);
-    composer_set_glissando(SQUARE, 18, 0, 8, 255, CONSTANT, true, true, composer_get_note_index(A_4), 1);
+    composer_set_glissando(SQUARE, 28, 0, 8, 255, CONSTANT, false, false, composer_get_note_index(A_4), 2);
+    composer_set_glissando(SQUARE, 30, 0, 8, 255, CONSTANT, true, true, composer_get_note_index(A_4), 1);
+
+    composer_set_slides(SAWTOOTH, 32, 0, 16, 255, CONSTANT, true, false, 2, A_4, A_6, B_4, B_6);
+    composer_set_rests(SAWTOOTH, 34, 0, 1, 2, 4);
+    composer_set_rests(SAWTOOTH, 38, 0, 1, 2, 4);
+    composer_apply_dynamics(SAWTOOTH, 32, 0, 32, 192, 255);
+    composer_apply_dynamics(SAWTOOTH, 36, 0, 32, 192, 255);
 }
 #else
 #error "Either USE_LOOPER_1, USE_LOOPER_2, or USE_LOOPER_3 must be defined for main.c"
@@ -317,6 +325,7 @@ void setup_looper() {
 
 int main(int argc, char *argv[]) {
     setup_looper();
+
     #if defined(_WIN32) || defined(_WIN64)
     const uint64_t interval_us = 1000000 / SAMPLE_RATE;
 

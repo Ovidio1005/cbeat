@@ -40,14 +40,14 @@ void compute_attributes(NoteAttributes attributes, uint16_t sample_in_sixteenth,
         *out_frequency = 0;
         *out_amplitude = 0;
     } else {
-        *out_frequency = linear_interpolate_16(
+        *out_frequency = linear_interpolate_16_short(
             attributes.frequency_start,
             attributes.frequency_end,
             sample_in_sixteenth,
             samples_per_sixteenth
         );
 
-        *out_amplitude = linear_interpolate_8(
+        *out_amplitude = linear_interpolate_8_short(
             attributes.volume_start,
             attributes.volume_end,
             sample_in_sixteenth,

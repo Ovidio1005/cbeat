@@ -3,50 +3,68 @@
 
 // All of these functions cast the values to a larger type to prevent overflow during calculations.
 
-uint16_t linear_interpolate_16_long(uint16_t start, uint16_t end, uint32_t position, uint32_t length) {
-    if(length == 0) return start; // Avoid division by zero
-    if(position <= 0) return start;
-    if(position >= length) return end;
-
-    return start + (((int64_t)end - (int64_t)start) * (int64_t)position) / length;
+uint16_t linear_interpolate_16_long(uint16_t start, uint16_t end, int64_t position, int64_t length){
+    if(length <= 0) return start; // Avoid division by zero
+    else if(position <= 0) return start;
+    else if(position >= length) return end;
+    else return start + (uint16_t)((end - start) * (int64_t)position / (int64_t)length);
 }
 
-uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint16_t position, uint16_t length) {
+uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint32_t position, uint32_t length){
     if(length == 0) return start; // Avoid division by zero
-    if(position <= 0) return start;
-    if(position >= length) return end;
-
-    return start + (((int32_t)end - (int32_t)start) * (int32_t)position) / length;
+    else if(position == 0) return start;
+    else if(position >= length) return end;
+    else return start + (uint16_t)(((int64_t)end - (int64_t)start) * (int64_t)position / (int64_t)length);
 }
 
-uint8_t linear_interpolate_8(uint8_t start, uint8_t end, uint16_t position, uint16_t length) {
+uint16_t linear_interpolate_16_short(uint16_t start, uint16_t end, uint16_t position, uint16_t length){
     if(length == 0) return start; // Avoid division by zero
-    if(position <= 0) return start;
-    if(position >= length) return end;
-
-    return start + (((int16_t)end - (int16_t)start) * (int16_t)position) / length;
+    else if(position == 0) return start;
+    else if(position >= length) return end;
+    else return start + (uint16_t)(((int32_t)end - (int32_t)start) * (int32_t)position / (int32_t)length);
 }
 
-uint16_t quadratic_interpolate_16(uint16_t start, uint16_t end, uint16_t position, uint16_t length) {
-    if(length == 0) return start; // Avoid division by zero
-    if(position <= 0) return start;
-    if(position >= length) return end;
-
-    uint64_t pos_squared = (uint64_t)position * (uint64_t)position;
-    uint64_t len_squared = (uint64_t)length * (uint64_t)length;
-
-    return start + (((int64_t)end - (int64_t)start) * pos_squared) / len_squared;
+uint8_t linear_interpolate_8_long(uint8_t start, uint8_t end, int64_t position, int64_t length){
+    if(length <= 0) return start; // Avoid division by zero
+    else if(position <= 0) return start;
+    else if(position >= length) return end;
+    else return start + (uint8_t)((end - start) * (int64_t)position / (int64_t)length);
 }
 
-uint8_t quadratic_interpolate_8(uint8_t start, uint8_t end, uint16_t position, uint16_t length) {
+uint8_t linear_interpolate_8(uint8_t start, uint8_t end, uint32_t position, uint32_t length){
     if(length == 0) return start; // Avoid division by zero
-    if(position <= 0) return start;
-    if(position >= length) return end;
+    else if(position == 0) return start;
+    else if(position >= length) return end;
+    else return start + (uint8_t)(((int64_t)end - (int64_t)start) * (int64_t)position / (int64_t)length);
+}
 
-    uint32_t pos_squared = (uint32_t)position * (uint32_t)position;
-    uint32_t len_squared = (uint32_t)length * (uint32_t)length;
+uint8_t linear_interpolate_8_short(uint8_t start, uint8_t end, uint16_t position, uint16_t length){
+    if(length == 0) return start; // Avoid division by zero
+    else if(position == 0) return start;
+    else if(position >= length) return end;
+    else return start + (uint8_t)(((int32_t)end - (int32_t)start) * (int32_t)position / (int32_t)length);
+}
 
-    return start + (((int32_t)end - (int32_t)start) * pos_squared) / len_squared;
+uint16_t quadratic_interpolate_16(uint16_t start, uint16_t end, uint32_t position, uint32_t length){
+    if(length == 0) return start; // Avoid division by zero
+    else if(position == 0) return start;
+    else if(position >= length) return end;
+
+    int64_t inv_pos = (int64_t)length - (int64_t)position;
+    int64_t inv_pos_squared = inv_pos * inv_pos;
+    int64_t len_squared = (int64_t)length * (int64_t)length;
+    return linear_interpolate_16_long(end, start, inv_pos_squared, len_squared);
+}
+
+uint8_t quadratic_interpolate_8(uint8_t start, uint8_t end, uint32_t position, uint32_t length){
+    if(length == 0) return start; // Avoid division by zero
+    else if(position == 0) return start;
+    else if(position >= length) return end;
+    
+    int64_t inv_pos = (int64_t)length - (int64_t)position;
+    int64_t inv_pos_squared = inv_pos * inv_pos;
+    int64_t len_squared = (int64_t)length * (int64_t)length;
+    return linear_interpolate_8_long(end, start, inv_pos_squared, len_squared);
 }
 
 uint8_t apply_amplitude(uint8_t sample_value, uint8_t amplitude) {

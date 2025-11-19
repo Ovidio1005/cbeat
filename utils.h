@@ -11,9 +11,9 @@
 #include <stdint.h>
 
 /**
- * @brief Like `linear_interpolate_16`, but with 32-bit position and length.
+ * @brief Like `linear_interpolate_16`, but with 64-bit position and length.
  */
-uint16_t linear_interpolate_16_long(uint16_t start, uint16_t end, uint32_t position, uint32_t length);
+uint16_t linear_interpolate_16_long(uint16_t start, uint16_t end, int64_t position, int64_t length);
 
 /**
  * @brief Linearly interpolates between two 16-bit unsigned integers.
@@ -24,7 +24,18 @@ uint16_t linear_interpolate_16_long(uint16_t start, uint16_t end, uint32_t posit
  * @param length The total length of the interpolation.
  * @return The interpolated 16-bit unsigned integer.
  */
-uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint16_t position, uint16_t length);
+uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint32_t position, uint32_t length);
+
+/**
+ * @brief Like `linear_interpolate_16`, but with 16-bit position and length.
+ */
+uint16_t linear_interpolate_16_short(uint16_t start, uint16_t end, uint16_t position, uint16_t length);
+
+/**
+ * @brief Like `linear_interpolate_8`, but with 64-bit position and length.
+ */
+uint8_t linear_interpolate_8_long(uint8_t start, uint8_t end, int64_t position, int64_t length);
+
 /**
  * @brief Linearly interpolates between two 8-bit unsigned integers.
  * @details The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
@@ -34,28 +45,36 @@ uint16_t linear_interpolate_16(uint16_t start, uint16_t end, uint16_t position, 
  * @param length The total length of the interpolation.
  * @return The interpolated 8-bit unsigned integer.
  */
-uint8_t linear_interpolate_8(uint8_t start, uint8_t end, uint16_t position, uint16_t length);
+uint8_t linear_interpolate_8(uint8_t start, uint8_t end, uint32_t position, uint32_t length);
 
 /**
- * @brief Quadratically interpolates between two 16-bit unsigned integers.
- * @details The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
+ * @brief Like `linear_interpolate_8`, but with 16-bit position and length.
+ */
+uint8_t linear_interpolate_8_short(uint8_t start, uint8_t end, uint16_t position, uint16_t length);
+
+/**
+ * @brief Interpolates between two 16-bit unsigned integers using an inverse quadratic curve.
+ * @details The interpolation moves quickly when the position is near 0, and slows down as it approaches `length`.
+ * The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
  * @param start The starting value.
  * @param end The ending value.
  * @param position The current position in the interpolation, between 0 and `length`.
  * @param length The total length of the interpolation.
  * @return The interpolated 16-bit unsigned integer.
  */
-uint16_t quadratic_interpolate_16(uint16_t start, uint16_t end, uint16_t position, uint16_t length);
+uint16_t quadratic_interpolate_16(uint16_t start, uint16_t end, uint32_t position, uint32_t length);
+
 /**
- * @brief Quadratically interpolates between two 8-bit unsigned integers.
- * @details The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
+ * @brief Interpolates between two 8-bit unsigned integers using an inverse quadratic curve.
+ * @details The interpolation moves quickly when the position is near 0, and slows down as it approaches `length`.
+ * The interpolated value will never exceed the bounds of `start` and `end`, and will be clamped if `position` is outside the range [0, length].
  * @param start The starting value.
  * @param end The ending value.
  * @param position The current position in the interpolation, between 0 and `length`.
  * @param length The total length of the interpolation.
  * @return The interpolated 8-bit unsigned integer.
  */
-uint8_t quadratic_interpolate_8(uint8_t start, uint8_t end, uint16_t position, uint16_t length);
+uint8_t quadratic_interpolate_8(uint8_t start, uint8_t end, uint32_t position, uint32_t length);
 
 /**
  * @brief Applies amplitude scaling to an 8-bit audio sample.

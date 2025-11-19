@@ -14,12 +14,12 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#define DECAY_VOLUME_FACTOR 2
+#define DECAY_VOLUME_FACTOR 4
 #define HIT_VOLUME_FACTOR 4
-#define DECAY_SLOW_SAMPLES 16000
-#define DECAY_MEDIUM_SAMPLES 4000
-#define DECAY_FAST_SAMPLES 1000
-#define HIT_SAMPLES 500
+#define DECAY_SLOW_SAMPLES 32000
+#define DECAY_MEDIUM_SAMPLES 16000
+#define DECAY_FAST_SAMPLES 8000
+#define HIT_SAMPLES 4000
 
 typedef enum envelope {
     CONSTANT,
@@ -29,7 +29,7 @@ typedef enum envelope {
     HIT
 } Envelope;
 
-// Only used for glissando
+// Only used for glissando and semitone shift
 int composer_get_note_index(uint16_t frequency);
 uint16_t composer_get_frequency(int note_index);
 
